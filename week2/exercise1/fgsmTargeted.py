@@ -17,6 +17,8 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 
 import numpy as np
+import os
+import pathlib
 import ast
 
 
@@ -114,16 +116,18 @@ def fgsm(model, x, y, eps, target): # pass the target label as parameter for the
         return False
 
 
-model = load_model(MNISTNet, 'mnist.pt')
+cwd = pathlib.Path(__file__).parent.resolve()
+model = load_model(MNISTNet, os.path.join(cwd, 'mnist.pt'))
 num_adv, eps = 0, 0.2
 
-labels = np.array(ast.literal_eval(open('./week2/exercise1/toattack/labels.txt', 'r').readline()))
+label_file = os.path.join(cwd, 'toattack', 'labels.txt')
+labels = np.array(ast.literal_eval(open(label_file, 'r').readline()))
 
 num_attack = 5
 target = 0
 
 for i in range(num_attack):
-    file_name = './week2/exercise1/toattack/data' + str(i) + '.txt'
+    file_name = os.path.join(cwd, 'toattack', 'data') + str(i) + '.txt'
     x = np.array(ast.literal_eval(open(file_name, 'r').readline()))
     x = torch.Tensor(x)
     y = torch.Tensor([labels[i]]).type(torch.LongTensor)

@@ -17,6 +17,8 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 
 import numpy as np
+import os
+import pathlib
 import ast
 
 
@@ -126,14 +128,16 @@ def cw(model, x, y, eps, max_iter, c, target):
     return False
 
 
-model = load_model(MNISTNet, 'mnist.pt')
+cwd = pathlib.Path(__file__).parent.resolve()
+model = load_model(MNISTNet, os.path.join(cwd, 'mnist.pt'))
 num_adv, eps, max_iter, c, target = 0, 0.1, 100, 100, 0
 
-labels = np.array(ast.literal_eval(open('./week2/exercise2/toattack/labels.txt', 'r').readline()))
+label_file = os.path.join(cwd, 'toattack', 'labels.txt')
+labels = np.array(ast.literal_eval(open(label_file, 'r').readline()))
 
 num_attack = 5
 for i in range(num_attack):
-    file_name = './week2/exercise2/toattack/data' + str(i) + '.txt'
+    file_name = os.path.join(cwd, 'toattack', 'data') + str(i) + '.txt'
     x = np.array(ast.literal_eval(open(file_name, 'r').readline()))
     x = torch.Tensor(x)
     y = torch.Tensor([labels[i]]).type(torch.LongTensor)
