@@ -74,7 +74,7 @@ def attack(model, x, y):
     #The following shows one way of introducing some minor modification to 
     # the adversarial example, i.e, by adding some uniform noise. 
     x_adv = x.detach().clone()
-    noise = torch.Tensor(np.random.uniform(-0.1, 0.01, (1,1,28,28)))
+    noise = torch.Tensor(np.random.uniform(-0.1, 0.1, (1,1,28,28)))
     x_adv = torch.clamp(x_adv + noise, 0, 1)
 
     #TODO1: Modify the scale of the noise in the above method and note the 
@@ -92,19 +92,19 @@ def attack(model, x, y):
 
         y, y_adv = y.item(), y_adv.item()
 
-        #print('\nFound an adversarial sample!!!\n')
+        print('\nFound an adversarial sample!!!\n')
 
-        #print('pred adv = {}'.format(pred_adv.detach().numpy().reshape(-1)))
-        #print('lbl adv = {}\n'.format(y_adv))
+        print('pred adv = {}'.format(pred_adv.detach().numpy().reshape(-1)))
+        print('lbl adv = {}\n'.format(y_adv))
 
         display(x, y, x_adv, y_adv)
         return True
     else:
-        #print('\nCan\'t find adversarial samples!!!\n')
+        print('\nCan\'t find adversarial samples!!!\n')
         return False
 
 
-model = load_model(MNISTNet, 'mnist.pt')
+model = load_model(MNISTNet, './week3/exercise1/mnist.pt')
 changes = 0
 
 num_attack = 20
