@@ -36,6 +36,12 @@ class MNISTNet(nn.Module):
 
 def save_model(model, name):
     torch.save(model.state_dict(), name)
+    
+def load_model(model_class, name):
+    model = model_class()
+    model.load_state_dict(torch.load(name))
+
+    return model
 
 
 def train(model, dataloader, loss_fn, optimizer, device):
@@ -110,17 +116,21 @@ for i in backdoor_indexes:
 train_loader = torch.utils.data.DataLoader(train_dataset, **train_kwargs)
 test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
 
-model = MNISTNet().to(device)
+FORCE_RETRAIN = True
+if FORCE_RETRAIN:
+    model = MNISTNet().to(device)
 
-optimizer = optim.SGD(model.parameters(), lr=0.1)
-num_of_epochs = 20
+    optimizer = optim.SGD(model.parameters(), lr=0.1)
+    num_of_epochs = 20
 
-for epoch in range(num_of_epochs):
-    print('\n------------- Epoch {} -------------\n'.format(epoch))
-    train(model, train_loader, nn.CrossEntropyLoss(), optimizer, device)
-    test(model, test_loader, nn.CrossEntropyLoss(), device)
+    for epoch in range(num_of_epochs):
+        print('\n------------- Epoch {} -------------\n'.format(epoch))
+        train(model, train_loader, nn.CrossEntropyLoss(), optimizer, device)
+        test(model, test_loader, nn.CrossEntropyLoss(), device)
 
-save_model(model, 'mnist.pt')
+    save_model(model, 'mnist.pt')
+else:
+    model = load_model(MNISTNet, 'mnist.pt')
 
 # Modify test data to test backdoor accuracy
 backdoor_test_dataset = datasets.MNIST('../data', train=False, transform=transform)
